@@ -1,21 +1,36 @@
-// Add event listener to the nav links
-document.querySelectorAll('nav a').forEach((link) => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const href = link.getAttribute('href');
-        // Load the corresponding page
-        loadPage(href);
-    });
-});
+// script.js
+const inputText = document.getElementById('input-text');
+const submitButton = document.getElementById('submit-button');
+const outputText = document.getElementById('output-text');
 
-// Function to load the corresponding page
-function loadPage(href) {
-    // Use the Fetch API to load the page
-    fetch(href)
-        .then((response) => response.text())
-        .then((html) => {
-            // Replace the main content with the loaded page
-            document.querySelector('main').innerHTML = html;
-        })
-        .catch((error) => console.error('Error loading page:', error));
-}
+submitButton.addEventListener('click', async () => {
+    const prompt = inputText.value.trim();
+    if (prompt !== '') {
+        try {
+            const response = await fetch('https://api.groq.io/v1/queries', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer YOUR_GROQ_KEY',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `query MagnusOpus($prompt: String!) {
+                        magnusOpus(prompt: $prompt) {
+                            response
+                        }
+                    }`,
+                    variables: {
+                        prompt: prompt
+                    }
+                })
+            });
+            const data = await response.json();
+            outputText.innerText = data.data.magnusOpus.response;
+        } catch (error) {
+            console.error(error);
+            outputText.innerText = 'Error: ' + error.message;
+        }
+    } else {
+        outputText.innerText = 'Please enter a prompt.';
+    }
+});
