@@ -1,0 +1,8 @@
+torch
+transformers
+scikit-learn
+pandas
+networkx
+matplotlib
+pykeen
+nltk
